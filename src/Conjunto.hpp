@@ -74,7 +74,13 @@ void Conjunto<T>::remover(const T& clave) {
 
 template <class T>
 const T& Conjunto<T>::siguiente(const T& clave) {
-    std::stack<Nodo*>*stack = new std::stack<Nodo*>();
+    Nodo *anterior = this->_raiz;
+    Nodo *actual = anterior;
+
+    while(actual != nullptr) {
+        if(clave < actual->valor) actual = actual->izq;
+        else actual = actual->der;
+    }
 }
 
 template <class T>
@@ -115,10 +121,5 @@ const class Conjunto<T>::Nodo* Conjunto<T>::_buscar(const T &clave, const Conjun
     if(clave > nodo->valor) {
         return _buscar(clave, nodo->der);
     }
-}
-
-template<class T>
-const bool Conjunto<T>::Nodo::esHoja() const {
-    return this->izq == nullptr && this->der == nullptr;
 }
 
