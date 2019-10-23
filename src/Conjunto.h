@@ -58,6 +58,7 @@ class Conjunto
             Nodo* der;
 
             const int cantidadHijos() const;
+            const unsigned int contarSubnodos() const;
         };
 
         // Puntero a la raíz de nuestro árbol.
