@@ -13,6 +13,7 @@ Conjunto<T>::~Conjunto() {
   while(i < cardinal) {
       this->remover(actual);
       actual = this->siguiente(actual);
+      i++;
   }
 }
 
@@ -128,6 +129,7 @@ void Conjunto<T>::mostrar(std::ostream& o) const {
     while(i < cardinal) {
         o << actual + " ";
         actual = this->siguiente(actual);
+        i++;
     }
 }
 
