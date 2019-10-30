@@ -82,7 +82,7 @@ void Conjunto<T>::remover(const T& clave) {
 }
 
 template <class T>
-const class Conjunto<T>::Nodo* Conjunto<T>::_sucesor(const Nodo* nodo) {
+const class Conjunto<T>::Nodo* Conjunto<T>::_sucesor(const Nodo* nodo) const {
     Nodo* actual = nodo->der;
     while(actual->izq != nullptr) {
       actual = actual->izq;
@@ -118,6 +118,7 @@ const T& Conjunto<T>::maximo() const {
 
 template <class T>
 unsigned int Conjunto<T>::cardinal() const {
+    if(this->_raiz == nullptr) return 0;
     return this->_raiz->contarSubnodos();
 }
 
@@ -153,7 +154,7 @@ const class Conjunto<T>::Nodo* Conjunto<T>::_buscar(const T &clave, const Conjun
 }
 
 template<class T>
-const int Conjunto<T>::Nodo*::cantidadHijos() const {
+const int Conjunto<T>::Nodo::cantidadHijos() const {
   int cantidad = 0;
   if(this->izq != nullptr) cantidad++;
   if(this->der != nullptr) cantidad++;
@@ -161,7 +162,7 @@ const int Conjunto<T>::Nodo*::cantidadHijos() const {
 }
 
 template<class T>
-const unsigned int Conjunto<T>::Nodo*::contarSubnodos() const {
+const unsigned int Conjunto<T>::Nodo::contarSubnodos() const {
   int subnodos = 0;
   if(this->izq != nullptr) {
     subnodos += 1 + this->izq->contarSubnodos();
@@ -173,3 +174,6 @@ const unsigned int Conjunto<T>::Nodo*::contarSubnodos() const {
 
   return subnodos;
 }
+
+template<class T>
+Conjunto<T>::Nodo::Nodo(const T &v) : valor(v), izq(nullptr), der(nullptr){}
