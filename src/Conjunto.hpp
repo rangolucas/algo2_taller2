@@ -9,6 +9,7 @@ template <class T>
 Conjunto<T>::~Conjunto() {
   int i = 0;
   int cardinal = this->cardinal();
+  if(cardinal == 0) return;
   T actual = this->minimo();
   while(i < cardinal) {
       this->remover(actual);
@@ -19,7 +20,9 @@ Conjunto<T>::~Conjunto() {
 
 template <class T>
 bool Conjunto<T>::pertenece(const T& clave) const {
-    return _buscar(clave, this->_raiz) != nullptr;
+    Iterador iterador = Iterador();
+    iterador.st.push(this->_raiz);
+    return _buscar(clave, iterador).actual() != nullptr;
 }
 
 template <class T>
@@ -81,6 +84,7 @@ void Conjunto<T>::remover(const T& clave) {
     }
 }
 
+//pre: nodo tiene hijo derecho
 template <class T>
 const class Conjunto<T>::Nodo* Conjunto<T>::_sucesor(const Nodo* nodo) const {
     Nodo* actual = nodo->der;
@@ -92,8 +96,10 @@ const class Conjunto<T>::Nodo* Conjunto<T>::_sucesor(const Nodo* nodo) const {
 
 template <class T>
 const T& Conjunto<T>::siguiente(const T& clave) {
-    const Nodo* nodoClave = this->_buscar(clave, this->_raiz);
-    return this->_sucesor(nodoClave)->valor;
+    Iterador iterador = Iterador();
+    iterador.st.push(this->_raiz);
+    const Iterador &it = this->_buscar(clave, iterador);
+    return it.siguiente()->valor;
 }
 
 template <class T>
@@ -119,7 +125,7 @@ const T& Conjunto<T>::maximo() const {
 template <class T>
 unsigned int Conjunto<T>::cardinal() const {
     if(this->_raiz == nullptr) return 0;
-    return this->_raiz->contarSubnodos();
+    return this->_raiz->contarSubnodos() + 1;
 }
 
 template <class T>
@@ -135,21 +141,20 @@ void Conjunto<T>::mostrar(std::ostream& o) const {
 }
 
 template<class T>
-const class Conjunto<T>::Nodo* Conjunto<T>::_buscar(const T &clave, const Conjunto::Nodo *nodo) const {
-    if(nodo == nullptr) {
-        return nullptr;
+const class Conjunto<T>::Iterador Conjunto<T>::_buscar(const T &clave, Iterador iterador) const {
+    Nodo *pNodo = iterador.actual();
+    if(pNodo == nullptr || pNodo->valor == clave) {
+        return iterador;
     }
 
-    if(nodo->valor == clave) {
-        return nodo;
+    if(clave < pNodo->valor) {
+        iterador.st.push(pNodo->izq);
+        return _buscar(clave, iterador);
     }
 
-    if(clave < nodo->valor) {
-        return _buscar(clave, nodo->izq);
-    }
-
-    if(clave > nodo->valor) {
-        return _buscar(clave, nodo->der);
+    if(clave > pNodo->valor) {
+        iterador.st.push(pNodo->der);
+        return _buscar(clave, iterador);
     }
 }
 
@@ -163,7 +168,7 @@ const int Conjunto<T>::Nodo::cantidadHijos() const {
 
 template<class T>
 const unsigned int Conjunto<T>::Nodo::contarSubnodos() const {
-  int subnodos = 0;
+  unsigned int subnodos = 0;
   if(this->izq != nullptr) {
     subnodos += 1 + this->izq->contarSubnodos();
   }
@@ -177,3 +182,19 @@ const unsigned int Conjunto<T>::Nodo::contarSubnodos() const {
 
 template<class T>
 Conjunto<T>::Nodo::Nodo(const T &v) : valor(v), izq(nullptr), der(nullptr){}
+
+
+template<class T>
+Conjunto<T>::Iterador::Iterador(){
+    this->st = stack<Nodo*>();
+}
+
+template<class T>
+typename Conjunto<T>::Nodo* Conjunto<T>::Iterador::actual() const {
+    return this->st.top();
+}
+
+//pre: hay siguiente
+template<class T>
+typename Conjunto<T>::Nodo* Conjunto<T>::Iterador::siguiente() const {
+}

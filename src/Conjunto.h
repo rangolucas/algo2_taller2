@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string>
 #include <iostream>
+#include <stack>
 
 using namespace std;
 
@@ -61,10 +62,19 @@ class Conjunto
             const unsigned int contarSubnodos() const;
         };
 
+        class Iterador {
+        public:
+            Iterador();
+
+            Nodo* actual() const;
+            Nodo* siguiente() const;
+            stack<Nodo*> st;
+        };
+
         // Puntero a la raíz de nuestro árbol.
         Nodo* _raiz;
 
-        const Nodo* _buscar(const T &, const Nodo *) const;
+        const Iterador _buscar(const T &, Iterador iterador) const;
         const Nodo* _sucesor(const Nodo*) const;
 
 };
