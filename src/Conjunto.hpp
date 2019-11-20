@@ -12,8 +12,12 @@ Conjunto<T>::~Conjunto() {
   if(cardinal == 0) return;
   T actual = this->minimo();
   while(i < cardinal) {
+      T siguiente;
+      if(i + 1 < cardinal) {
+          siguiente = this->siguiente(actual);
+      }
       this->remover(actual);
-      actual = this->siguiente(actual);
+      actual = siguiente;
       i++;
   }
 }
@@ -27,6 +31,7 @@ bool Conjunto<T>::pertenece(const T& clave) const {
 
 template <class T>
 void Conjunto<T>::insertar(const T& clave) {
+    if(this->pertenece(clave)) return;
     Nodo *nuevoNodo = new Nodo(clave);
 
     if(this->_raiz == nullptr) {
@@ -58,14 +63,17 @@ void Conjunto<T>::remover(const T& clave) {
     Nodo *actual = this->_raiz;
     Nodo *anterior = actual;
     while(actual->valor != clave) {
+        anterior = actual;
         if(clave < actual->valor) actual = actual->izq;
         else actual = actual->der;
     }
 
     switch(actual->cantidadHijos()) {
         case 0:
-            if(anterior->izq == actual) anterior->izq = nullptr;
+            if(this->_raiz == actual) this->_raiz = nullptr;
+            else if(anterior->izq == actual) anterior->izq = nullptr;
             else anterior->der = nullptr;
+
             delete actual;
             break;
         case 1:
@@ -73,6 +81,8 @@ void Conjunto<T>::remover(const T& clave) {
             if(actual->izq == nullptr) nodoABorrar = actual->der;
             else nodoABorrar = actual->izq;
             actual->valor = nodoABorrar->valor;
+            actual->izq = nodoABorrar->izq;
+            actual->der = nodoABorrar->der;
             delete nodoABorrar;
             break;
         case 2:
@@ -86,7 +96,7 @@ void Conjunto<T>::remover(const T& clave) {
 
 //pre: nodo tiene hijo derecho
 template <class T>
-const class Conjunto<T>::Nodo* Conjunto<T>::_sucesor(const Nodo* nodo) const {
+class Conjunto<T>::Nodo* Conjunto<T>::_sucesor(const Nodo* nodo) const {
     Nodo* actual = nodo->der;
     while(actual->izq != nullptr) {
       actual = actual->izq;
@@ -98,8 +108,9 @@ template <class T>
 const T& Conjunto<T>::siguiente(const T& clave) {
     Iterador iterador = Iterador();
     iterador.st.push(this->_raiz);
-    const Iterador &it = this->_buscar(clave, iterador);
-    return it.siguiente()->valor;
+    iterador = this->_buscar(clave, iterador);
+    iterador = iterador.avanzar();
+    return iterador.actual()->valor;
 }
 
 template <class T>
@@ -141,7 +152,7 @@ void Conjunto<T>::mostrar(std::ostream& o) const {
 }
 
 template<class T>
-const class Conjunto<T>::Iterador Conjunto<T>::_buscar(const T &clave, Iterador iterador) const {
+class Conjunto<T>::Iterador Conjunto<T>::_buscar(const T &clave, Iterador iterador) const {
     Nodo *pNodo = iterador.actual();
     if(pNodo == nullptr || pNodo->valor == clave) {
         return iterador;
@@ -191,10 +202,21 @@ Conjunto<T>::Iterador::Iterador(){
 
 template<class T>
 typename Conjunto<T>::Nodo* Conjunto<T>::Iterador::actual() const {
+    if(this->st.size() == 0) return nullptr;
     return this->st.top();
 }
 
-//pre: hay siguiente
 template<class T>
-typename Conjunto<T>::Nodo* Conjunto<T>::Iterador::siguiente() const {
+typename Conjunto<T>::Iterador Conjunto<T>::Iterador::avanzar() {
+    Nodo* top = st.top();
+    this->st.pop();
+
+    if(top->der != nullptr) {
+        Nodo* actual = top->der;
+        while(actual != nullptr) {
+            st.push(actual);
+            actual = actual->izq;
+        }
+    }
+    return *this;
 }

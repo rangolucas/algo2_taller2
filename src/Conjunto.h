@@ -67,15 +67,15 @@ class Conjunto
             Iterador();
 
             Nodo* actual() const;
-            Nodo* siguiente() const;
+            Iterador avanzar();
             stack<Nodo*> st;
         };
 
         // Puntero a la raíz de nuestro árbol.
         Nodo* _raiz;
 
-        const Iterador _buscar(const T &, Iterador iterador) const;
-        const Nodo* _sucesor(const Nodo*) const;
+        Iterador _buscar(const T &, Iterador iterador) const;
+        Nodo* _sucesor(const Nodo*) const;
 
 };
 
